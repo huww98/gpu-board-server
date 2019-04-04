@@ -38,7 +38,7 @@ class Memory(Serialize):
 
     def update(self):
         memory = py3nvml.nvmlDeviceGetMemoryInfo(self.handle)
-        self.total = memory.total
+        # self.total = memory.total
         self.free = memory.free
         self.used = memory.used
 
