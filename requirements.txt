@@ -1,4 +1,4 @@
 sanic
 python-socketio
-gpustat
 py3nvml
+psutil

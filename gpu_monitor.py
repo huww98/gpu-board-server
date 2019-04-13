@@ -1,8 +1,8 @@
 from py3nvml import py3nvml
-import socket
+# import socket
 import json
 from abc import abstractmethod
-from pprint import pprint
+# from pprint import pprint
 from typing import List, Union
 import psutil
 from datetime import datetime
@@ -77,11 +77,13 @@ class Process(Serialize):
         process = psutil.Process(pid=self.pid)
         self.command = ' '.join(process.cmdline())
         self.username = process.username()
+        self.name = process.name()
         # print(' '.join(process.cmdline()))
 
     def to_json(self) -> Union[list, dict]:
         return {
             'pid': self.pid,
+            'name': self.name,
             'memory': self.memory,
             'command': self.command,
             'username': self.username,
@@ -107,14 +109,15 @@ class GpuInfo(Serialize):
     name: str
     memory: Memory
 
-    def __init__(self, handle):
-        self.handle = handle
+    def __init__(self, index: int):
+        self.index = index
+        self.handle = py3nvml.nvmlDeviceGetHandleByIndex(index)
 
-        self.name = py3nvml.nvmlDeviceGetName(handle)
+        self.name = py3nvml.nvmlDeviceGetName(self.handle)
 
-        self.memory = Memory(handle)
-        self.utilization = Utilization(handle)
-        self.processes = Processes(handle)
+        self.memory = Memory(self.handle)
+        self.utilization = Utilization(self.handle)
+        self.processes = Processes(self.handle)
 
         self.update()
 
@@ -125,6 +128,7 @@ class GpuInfo(Serialize):
 
     def to_json(self) -> Union[list, dict]:
         return {
+            'index': self.index,
             'name': self.name,
             'memory': self.memory.to_json(),
             'utilization': self.utilization.to_json(),
@@ -137,7 +141,7 @@ class GpuList(Serialize):
 
     def __init__(self):
         num_gpus = py3nvml.nvmlDeviceGetCount()
-        self.gpus = [GpuInfo(py3nvml.nvmlDeviceGetHandleByIndex(i))
+        self.gpus = [GpuInfo(i)
                      for i in range(num_gpus)]
 
     def update(self):
@@ -186,5 +190,5 @@ class GpuMonitor(Serialize):
 if __name__ == '__main__':
     with GpuMonitor() as m:
         m.update()
-        pprint(m.to_json())
+        # pprint(m.to_json())
         print(json.dumps(m.to_json()))
