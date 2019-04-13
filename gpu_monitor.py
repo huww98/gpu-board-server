@@ -5,6 +5,7 @@ from abc import abstractmethod
 from pprint import pprint
 from typing import List, Union
 import psutil
+from datetime import datetime
 
 
 # def get_local_ip() -> str:
@@ -38,7 +39,7 @@ class Memory(Serialize):
 
     def update(self):
         memory = py3nvml.nvmlDeviceGetMemoryInfo(self.handle)
-        # self.total = memory.total
+        self.total = memory.total
         self.free = memory.free
         self.used = memory.used
 
@@ -136,7 +137,8 @@ class GpuList(Serialize):
 
     def __init__(self):
         num_gpus = py3nvml.nvmlDeviceGetCount()
-        self.gpus = [GpuInfo(py3nvml.nvmlDeviceGetHandleByIndex(i)) for i in range(num_gpus)]
+        self.gpus = [GpuInfo(py3nvml.nvmlDeviceGetHandleByIndex(i))
+                     for i in range(num_gpus)]
 
     def update(self):
         for gpu in self.gpus:
@@ -149,6 +151,7 @@ class GpuList(Serialize):
 class GpuMonitor(Serialize):
     driver_version: str
     gpus: GpuList
+    query_time: datetime
 
     def __init__(self):
         py3nvml.nvmlInit()
@@ -157,12 +160,14 @@ class GpuMonitor(Serialize):
         self.update()
 
     def update(self):
+        self.query_time = datetime.now()
         self.gpus.update()
 
     def to_json(self) -> Union[list, dict]:
         return {
             'driver_version': self.driver_version,
-            'gpus': self.gpus.to_json()
+            'gpus': self.gpus.to_json(),
+            'query_time': self.query_time.isoformat()
         }
 
     def close(self):
