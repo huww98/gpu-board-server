@@ -4,4 +4,5 @@ services:
     build: .
     ports:
       - "8000:8000"
-      
+    volumes:
+      - "/usr/lib/nvidia-396/libnvidia-ml.so.1:/usr/lib/libnvidia-ml.so.1"

@@ -41,6 +41,7 @@ async def update_gpu_stats():
         else:
             if gm is not None:
                 gm.close()
+                gm = None
 
 
 if __name__ == "__main__":
