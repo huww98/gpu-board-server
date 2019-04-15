@@ -7,4 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD [ "python", "main.py" ]
+ENV NVIDIA_VISIBLE_DEVICES all
+EXPOSE 8000
+
+ENTRYPOINT [ "python", "/usr/src/app/main.py" ]

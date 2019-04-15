@@ -1,6 +1,0 @@
-[Unit]
-Description=Gpu Board Server
-After=network.target
-
-[Service]
-ExecStart=
