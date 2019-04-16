@@ -16,5 +16,5 @@ docker run --detach --runtime nvidia --pid host \
     --restart always \
     --volume /etc/passwd:/etc/passwd:ro \
     --publish 8000:8000 \
-    gpu-board-server
+    huww98/gpu-board-server
 ```
