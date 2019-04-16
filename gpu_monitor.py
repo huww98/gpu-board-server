@@ -5,7 +5,7 @@ from abc import abstractmethod
 # from pprint import pprint
 from typing import List, Union
 import psutil
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 # def get_local_ip() -> str:
@@ -164,7 +164,7 @@ class GpuMonitor(Serialize):
         self.update()
 
     def update(self):
-        self.query_time = datetime.now()
+        self.query_time = datetime.now(timezone.utc)
         self.gpus.update()
 
     def to_json(self) -> Union[list, dict]:
