@@ -74,11 +74,13 @@ class Process(Serialize):
     def __init__(self, p):
         self.pid = p.pid
         self.memory = p.usedGpuMemory
-        process = psutil.Process(pid=self.pid)
-        self.command = ' '.join(process.cmdline())
-        self.username = process.username()
-        self.name = process.name()
-        # print(' '.join(process.cmdline()))
+        try:
+            process = psutil.Process(pid=self.pid)
+            self.command = ' '.join(process.cmdline())
+            self.username = process.username()
+            self.name = process.name()
+        except psutil.NoSuchProcess:
+            pass # Sometimes process finishes just before we check
 
     def to_json(self) -> Union[list, dict]:
         return {
