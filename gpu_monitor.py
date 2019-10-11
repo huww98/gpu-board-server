@@ -76,20 +76,26 @@ class Process(Serialize):
         self.memory = p.usedGpuMemory
         try:
             process = psutil.Process(pid=self.pid)
+            self.process_found = True
             self.command = ' '.join(process.cmdline())
             self.username = process.username()
             self.name = process.name()
         except psutil.NoSuchProcess:
-            pass # Sometimes process finishes just before we check
+            # Sometimes process finishes just before we check
+            self.process_found = False
 
     def to_json(self) -> Union[list, dict]:
-        return {
+        json_content = {
             'pid': self.pid,
-            'name': self.name,
             'memory': self.memory,
-            'command': self.command,
-            'username': self.username,
         }
+        if self.process_found:
+            json_content.update({
+                'name': self.name,
+                'command': self.command,
+                'username': self.username,
+            })
+        return json_content
 
 
 class Processes(Serialize):
